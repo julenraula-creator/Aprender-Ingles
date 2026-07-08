@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EnglishPost — Aprende inglés con postales</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Work+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EAE3D2;
+    --paper-back:#DDD2B8;
+    --paper-dark:#D8CFB8;
+    --ink:#26313D;
+    --red:#B5393A;
+    --blue:#2C4870;
+    --gold:#BB9440;
+    --green:#4C7A57;
+    --muted:#8A8272;
+    --white:#F6F2E7;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Work Sans', sans-serif;
+    background:
+      radial-gradient(circle at 20% 10%, rgba(255,255,255,0.25), transparent 40%),
+      var(--paper);
+    color:var(--ink);
+    min-height:100vh;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.015) 0px, rgba(0,0,0,0.015) 1px, transparent 1px, transparent 3px),
+      var(--paper);
+  }
+  .wrap{
+    max-width:760px;
+    margin:0 auto;
+    padding:28px 20px 60px;
+  }
+
+  /* HEADER */
+  header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding-bottom:18px;
+    margin-bottom:22px;
+    border-bottom:2px solid var(--ink);
+  }
+  .logo{
+    font-family:'Special Elite', cursive;
+    font-size:1.5rem;
+    letter-spacing:0.5px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .logo span.plane{ font-size:1.2rem; transform:rotate(-15deg); display:inline-block;}
+  .streak{
+    font-family:'Space Mono', monospace;
+    font-size:0.75rem;
+    background:var(--white);
+    border:1.5px solid var(--ink);
+    border-radius:3px;
+    padding:6px 10px;
+    text-align:right;
+    line-height:1.3;
+  }
+  .streak b{ font-size:0.95rem; display:block; color:var(--red);}
+
+  /* CATEGORY TABS */
+  .tabs{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:26px;
+  }
+  .tab{
+    font-family:'Space Mono', monospace;
+    font-size:0.72rem;
+    letter-spacing:0.3px;
+    text-transform:uppercase;
+    background:var(--white);
+    border:1.5px solid var(--ink);
+    border-radius:20px;
+    padding:7px 14px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    transition:transform .15s ease, background .15s ease;
+    color:var(--ink);
+  }
+  .tab:hover{ transform:translateY(-2px); }
+  .tab.active{
+    background:var(--ink);
+    color:var(--white);
+  }
+  .tab .count{
+    font-size:0.65rem;
+    opacity:0.7;
+  }
+
+  /* CARD STAGE */
+  .stage{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    margin-bottom:22px;
+  }
+  .progress-line{
+    font-family:'Space Mono', monospace;
+    font-size:0.72rem;
+    color:var(--muted);
+    margin-bottom:14px;
+    letter-spacing:0.5px;
+  }
+
+  .card-scene{
+    perspective:1400px;
+    width:100%;
+    max-width:460px;
+  }
+  .card{
+    position:relative;
+    width:100%;
+    aspect-ratio:3/2;
+    min-height:230px;
+    transform-style:preserve-3d;
+    transition:transform .6s cubic-bezier(.4,.2,.2,1);
+    cursor:pointer;
+  }
+  .card.flipped{ transform:rotateY(180deg); }
+  .face{
+    position:absolute;
+    inset:0;
+    backface-visibility:hidden;
+    border-radius:6px;
+    border:2px solid var(--ink);
+    padding:22px;
+    display:flex;
+    flex-direction:column;
+    box-shadow:5px 6px 0 rgba(38,49,61,0.18);
+    background:var(--white);
+    background-image:
+      linear-gradient(135deg, transparent 0 8px, transparent 8px),
+      repeating-linear-gradient(-45deg, var(--red) 0 10px, var(--white) 10px 20px, var(--white) 20px 30px, var(--blue) 30px 40px, var(--white) 40px 50px);
+    background-size: 100% 10px;
+    background-repeat:no-repeat;
+    background-position: top left, top left;
+  }
+  .face::before{
+    content:"";
+    position:absolute;
+    top:0; left:0; right:0;
+    height:8px;
+    background-image: repeating-linear-gradient(-45deg, var(--red) 0 8px, var(--white) 8px 16px, var(--white) 16px 24px, var(--blue) 24px 32px, var(--white) 32px 40px);
+    border-radius:6px 6px 0 0;
+  }
+  .face.back{
+    transform:rotateY(180deg);
+    background-color:var(--paper-back);
+  }
+  .stamp{
+    position:absolute;
+    top:16px;
+    right:16px;
+    width:46px;
+    height:56px;
+    border:2px dashed var(--gold);
+    border-radius:3px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1.4rem;
+    background:rgba(255,255,255,0.5);
+    transform:rotate(4deg);
+  }
+  .level-tag{
+    position:absolute;
+    top:20px;
+    left:20px;
+    font-family:'Space Mono', monospace;
+    font-size:0.6rem;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    color:var(--muted);
+    border:1px solid var(--muted);
+    padding:2px 7px;
+    border-radius:10px;
+  }
+  .card-text{
+    margin-top:46px;
+    font-size:1.15rem;
+    line-height:1.5;
+    flex:1;
+    display:flex;
+    align-items:center;
+  }
+  .card.front-only .card-text{ font-weight:500; }
+  .blank{
+    display:inline-block;
+    border-bottom:2px solid var(--ink);
+    min-width:52px;
+    text-align:center;
+  }
+  .key-answer{
+    font-family:'Special Elite', cursive;
+    font-size:1.5rem;
+    color:var(--red);
+    margin-top:46px;
+  }
+  .full-sentence{
+    font-size:1rem;
+    margin-top:10px;
+    color:var(--ink);
+    line-height:1.5;
+  }
+  .example{
+    margin-top:auto;
+    font-size:0.82rem;
+    color:var(--muted);
+    font-style:italic;
+    border-top:1px dotted var(--muted);
+    padding-top:8px;
+  }
+  .hint{
+    text-align:center;
+    font-family:'Space Mono', monospace;
+    font-size:0.68rem;
+    color:var(--muted);
+    margin-top:12px;
+    letter-spacing:0.4px;
+  }
+
+  /* ACTIONS */
+  .actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    justify-content:center;
+    margin-top:20px;
+    width:100%;
+    max-width:460px;
+  }
+  .stamp-btn{
+    font-family:'Special Elite', cursive;
+    font-size:0.85rem;
+    border:2px solid var(--ink);
+    border-radius:4px;
+    background:var(--white);
+    padding:10px 16px;
+    cursor:pointer;
+    flex:1;
+    min-width:140px;
+    transition:transform .12s ease, background .12s ease, color .12s ease;
+    color:var(--ink);
+  }
+  .stamp-btn:hover{ transform:rotate(-1deg) scale(1.02); }
+  .stamp-btn.practice:hover{ background:var(--blue); color:var(--white); border-color:var(--blue);}
+  .stamp-btn.master:hover{ background:var(--green); color:var(--white); border-color:var(--green);}
+  .stamp-btn.save{
+    flex-basis:100%;
+    background:var(--paper);
+  }
+  .stamp-btn.save.active{
+    background:var(--red);
+    color:var(--white);
+    border-color:var(--red);
+  }
+  .stamp-btn:disabled{ opacity:0.5; cursor:default; }
+
+  /* FAVORITES PANEL */
+  .mailbag{
+    margin-top:34px;
+    border-top:2px solid var(--ink);
+    padding-top:18px;
+  }
+  .mailbag h2{
+    font-family:'Special Elite', cursive;
+    font-size:1.05rem;
+    margin:0 0 4px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .mailbag p.sub{
+    font-family:'Space Mono', monospace;
+    font-size:0.7rem;
+    color:var(--muted);
+    margin:0 0 14px;
+  }
+  .mail-list{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .mail-item{
+    background:var(--white);
+    border:1.5px solid var(--ink);
+    border-radius:4px;
+    padding:10px 12px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+  }
+  .mail-item .txt b{
+    font-family:'Special Elite', cursive;
+    color:var(--red);
+    font-weight:400;
+  }
+  .mail-item .txt div{
+    font-size:0.85rem;
+    color:var(--muted);
+    margin-top:2px;
+  }
+  .mail-item button{
+    font-family:'Space Mono', monospace;
+    font-size:0.65rem;
+    border:none;
+    background:none;
+    color:var(--muted);
+    cursor:pointer;
+    text-decoration:underline;
+    white-space:nowrap;
+  }
+  .empty-mail{
+    font-size:0.85rem;
+    color:var(--muted);
+    font-style:italic;
+  }
+
+  @media (max-width:480px){
+    .logo{font-size:1.2rem;}
+    .card-text{font-size:1.02rem;}
+    .key-answer{font-size:1.25rem;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .card, .tab, .stamp-btn{ transition:none !important; }
+  }
+
+  button:focus-visible, .tab:focus-visible, .card:focus-visible{
+    outline:3px solid var(--blue);
+    outline-offset:2px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo"><span class="plane">✈</span> EnglishPost</div>
+    <div class="streak">Postales enviadas<b id="streakCount">0</b></div>
+  </header>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div class="stage">
+    <div class="progress-line" id="progressLine"></div>
+    <div class="card-scene">
+      <div class="card" id="card" tabindex="0" role="button" aria-label="Voltear tarjeta">
+        <div class="face front">
+          <span class="level-tag" id="levelTag">básico</span>
+          <span class="stamp" id="stampIcon">👋</span>
+          <div class="card-text" id="frontText"></div>
+        </div>
+        <div class="face back">
+          <span class="level-tag">respuesta</span>
+          <span class="stamp" id="stampIconBack">👋</span>
+          <div>
+            <div class="key-answer" id="answerText"></div>
+            <div class="full-sentence" id="fullText"></div>
+          </div>
+          <div class="example" id="exampleText"></div>
+        </div>
+      </div>
+    </div>
+    <div class="hint">toca la tarjeta para voltearla</div>
+
+    <div class="actions">
+      <button class="stamp-btn practice" id="btnPractice">Aún practicando</button>
+      <button class="stamp-btn master" id="btnMaster">¡Lo domino!</button>
+      <button class="stamp-btn save" id="btnSave">♥ Guardar en mi correspondencia</button>
+    </div>
+  </div>
+
+  <div class="mailbag">
+    <h2>✉ Mi correspondencia</h2>
+    <p class="sub">frases guardadas para repasar cuando quieras</p>
+    <div class="mail-list" id="mailList"></div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+
+  const CARDS = [
+    // GREETINGS
+    {id:"g1",cat:"greetings",level:"básico",front:"Hi, my name is Laura. What's your ___?",answer:"name",full:"Hi, my name is Laura. What's your name?",example:"It's nice to meet you, Laura."},
+    {id:"g2",cat:"greetings",level:"básico",front:"___ to meet you! I've heard so much about you.",answer:"Nice",full:"Nice to meet you! I've heard so much about you.",example:"Nice to meet you too."},
+    {id:"g3",cat:"greetings",level:"básico",front:"Long time no ___! How have you been?",answer:"see",full:"Long time no see! How have you been?",example:"I've been great, thanks for asking."},
+    {id:"g4",cat:"greetings",level:"intermedio",front:"I just moved here. Do you have any ___ for a good coffee shop?",answer:"recommendations",full:"I just moved here. Do you have any recommendations for a good coffee shop?",example:"There's a great one right around the corner."},
+    {id:"g5",cat:"greetings",level:"básico",front:"Good morning! Did you ___ well last night?",answer:"sleep",full:"Good morning! Did you sleep well last night?",example:"Yes, I slept like a baby."},
+    {id:"g6",cat:"greetings",level:"intermedio",front:"This is my colleague, Mark. He ___ in the marketing team.",answer:"works",full:"This is my colleague, Mark. He works in the marketing team.",example:"Nice to finally put a face to the name."},
+    {id:"g7",cat:"greetings",level:"básico",front:"Take care! Let's ___ in touch.",answer:"keep",full:"Take care! Let's keep in touch.",example:"Definitely, I'll text you later."},
+
+    // DAILY LIFE
+    {id:"d1",cat:"daily",level:"básico",front:"I need to do the ___ before it piles up.",answer:"laundry",full:"I need to do the laundry before it piles up.",example:"I hate folding socks the most."},
+    {id:"d2",cat:"daily",level:"básico",front:"Can you ___ the trash out before we leave?",answer:"take",full:"Can you take the trash out before we leave?",example:"Sure, I'll do it right now."},
+    {id:"d3",cat:"daily",level:"básico",front:"I'm running ___, I'll call you back in ten minutes.",answer:"late",full:"I'm running late, I'll call you back in ten minutes.",example:"No worries, take your time."},
+    {id:"d4",cat:"daily",level:"básico",front:"Let's grab ___ before the movie starts.",answer:"dinner",full:"Let's grab dinner before the movie starts.",example:"Sounds good, I know a place nearby."},
+    {id:"d5",cat:"daily",level:"básico",front:"I forgot my ___ at home again!",answer:"keys",full:"I forgot my keys at home again!",example:"Don't worry, I have a spare set."},
+    {id:"d6",cat:"daily",level:"intermedio",front:"It's my turn to do the ___ this week.",answer:"dishes",full:"It's my turn to do the dishes this week.",example:"Thanks, I really appreciate it."},
+    {id:"d7",cat:"daily",level:"básico",front:"Can you turn the ___ down? I'm on a call.",answer:"volume",full:"Can you turn the volume down? I'm on a call.",example:"Oh sorry, I didn't realize."},
+
+    // TRAVEL
+    {id:"t1",cat:"travel",level:"básico",front:"Excuse me, where is the nearest ___ station?",answer:"train",full:"Excuse me, where is the nearest train station?",example:"It's two blocks from here, turn left."},
+    {id:"t2",cat:"travel",level:"intermedio",front:"Do you have any ___ rooms available for tonight?",answer:"vacant",full:"Do you have any vacant rooms available for tonight?",example:"Yes, we have one room left."},
+    {id:"t3",cat:"travel",level:"intermedio",front:"I'd like to ___ my flight to an earlier one.",answer:"change",full:"I'd like to change my flight to an earlier one.",example:"Let me check available seats for you."},
+    {id:"t4",cat:"travel",level:"básico",front:"Could you recommend a good place to ___ around here?",answer:"eat",full:"Could you recommend a good place to eat around here?",example:"There's a fantastic noodle shop nearby."},
+    {id:"t5",cat:"travel",level:"básico",front:"I think I'm ___, can you help me find my hotel?",answer:"lost",full:"I think I'm lost, can you help me find my hotel?",example:"Sure, show me the address."},
+    {id:"t6",cat:"travel",level:"básico",front:"How much does it ___ to get to the airport?",answer:"cost",full:"How much does it cost to get to the airport?",example:"About twenty dollars by taxi."},
+    {id:"t7",cat:"travel",level:"intermedio",front:"Don't forget to ___ your passport before boarding.",answer:"check",full:"Don't forget to check your passport before boarding.",example:"Already double-checked, don't worry."},
+
+    // WORK
+    {id:"w1",cat:"work",level:"intermedio",front:"Could we ___ the meeting to next Monday?",answer:"reschedule",full:"Could we reschedule the meeting to next Monday?",example:"Sure, does 10 a.m. work for you?"},
+    {id:"w2",cat:"work",level:"básico",front:"I'll send you the report by the ___ of the day.",answer:"end",full:"I'll send you the report by the end of the day.",example:"Perfect, thank you."},
+    {id:"w3",cat:"work",level:"básico",front:"We need to ___ this project before the deadline.",answer:"finish",full:"We need to finish this project before the deadline.",example:"We're almost there, just one more step."},
+    {id:"w4",cat:"work",level:"intermedio",front:"Let's set up a ___ call to discuss the budget.",answer:"quick",full:"Let's set up a quick call to discuss the budget.",example:"I'm free after lunch."},
+    {id:"w5",cat:"work",level:"básico",front:"Sorry, I'm going to be a few minutes ___.",answer:"late",full:"Sorry, I'm going to be a few minutes late.",example:"No problem, we'll wait for you."},
+    {id:"w6",cat:"work",level:"básico",front:"Can you ___ me a copy of the presentation?",answer:"send",full:"Can you send me a copy of the presentation?",example:"I'll email it right now."},
+    {id:"w7",cat:"work",level:"básico",front:"I really appreciate your ___ on this project.",answer:"help",full:"I really appreciate your help on this project.",example:"Happy to help anytime."},
+
+    // EMOTIONS
+    {id:"e1",cat:"emotions",level:"básico",front:"I'm so ___ to see you again!",answer:"excited",full:"I'm so excited to see you again!",example:"Me too, it's been way too long."},
+    {id:"e2",cat:"emotions",level:"intermedio",front:"I feel really ___ about the exam tomorrow.",answer:"nervous",full:"I feel really nervous about the exam tomorrow.",example:"You'll do great, you've studied hard."},
+    {id:"e3",cat:"emotions",level:"avanzado",front:"That movie made me so ___, I almost cried.",answer:"emotional",full:"That movie made me so emotional, I almost cried.",example:"I know, the ending was beautiful."},
+    {id:"e4",cat:"emotions",level:"básico",front:"I'm ___ of you for finishing the marathon!",answer:"proud",full:"I'm proud of you for finishing the marathon!",example:"Thank you, it wasn't easy."},
+    {id:"e5",cat:"emotions",level:"básico",front:"Don't worry, everything is going to be ___.",answer:"fine",full:"Don't worry, everything is going to be fine.",example:"I hope so."},
+    {id:"e6",cat:"emotions",level:"intermedio",front:"I was ___ when I heard the news.",answer:"shocked",full:"I was shocked when I heard the news.",example:"Same here, I couldn't believe it."},
+    {id:"e7",cat:"emotions",level:"básico",front:"I feel a bit ___ today, I think I need some rest.",answer:"tired",full:"I feel a bit tired today, I think I need some rest.",example:"Go take a nap, I'll handle things here."},
+
+    // CONVERSATIONS
+    {id:"c1",cat:"conversations",level:"intermedio",front:"A: How's it going? B: Not bad, just a little ___.",answer:"busy",full:"A: How's it going? B: Not bad, just a little busy.",example:"A: Yeah, same here."},
+    {id:"c2",cat:"conversations",level:"básico",front:"A: Do you want to grab coffee later? B: Sure, ___ not?",answer:"why",full:"A: Do you want to grab coffee later? B: Sure, why not?",example:"A: Great, see you at 5."},
+    {id:"c3",cat:"conversations",level:"básico",front:"A: I can't find my phone anywhere. B: Did you ___ your pockets?",answer:"check",full:"A: I can't find my phone anywhere. B: Did you check your pockets?",example:"A: Oh, here it is!"},
+    {id:"c4",cat:"conversations",level:"avanzado",front:"A: This traffic is unbelievable. B: Tell me about ___.",answer:"it",full:"A: This traffic is unbelievable. B: Tell me about it.",example:"A: We're never going to make it on time."},
+    {id:"c5",cat:"conversations",level:"intermedio",front:"A: Are you free this weekend? B: I think so, ___ me check.",answer:"let",full:"A: Are you free this weekend? B: I think so, let me check.",example:"A: Okay, let me know!"},
+    {id:"c6",cat:"conversations",level:"básico",front:"A: I'm thinking about learning to cook. B: That's a great ___!",answer:"idea",full:"A: I'm thinking about learning to cook. B: That's a great idea!",example:"A: I'll start with something simple."},
+    {id:"c7",cat:"conversations",level:"avanzado",front:"A: Sorry I'm late! B: No worries, ___ happens.",answer:"it",full:"A: Sorry I'm late! B: No worries, it happens.",example:"A: Thanks for understanding."},
+  ];
+
+  const CATEGORIES = [
+    {key:"greetings", name:"Saludos", icon:"👋"},
+    {key:"daily", name:"Vida diaria", icon:"🏠"},
+    {key:"travel", name:"Viajes", icon:"✈️"},
+    {key:"work", name:"Trabajo", icon:"💼"},
+    {key:"emotions", name:"Emociones", icon:"❤️"},
+    {key:"conversations", name:"Conversaciones", icon:"💬"},
+  ];
+
+  let state = {
+    category: "greetings",
+    queue: [],
+    pos: 0,
+    flipped: false,
+    statuses: {},   // cardId -> 'practicing' | 'mastered'
+    favorites: [],  // array of cardId
+    streak: 0
+  };
+
+  const el = (id) => document.getElementById(id);
+
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]] = [a[j],a[i]];
+    }
+    return a;
+  }
+
+  function buildQueue(catKey){
+    const cards = CARDS.filter(c => c.cat === catKey);
+    let queue = shuffle(cards.map(c => c.id));
+    // push cards already marked practicing earlier in rotation more often
+    const practicingIds = queue.filter(id => state.statuses[id] === 'practicing');
+    queue = shuffle(queue.concat(practicingIds));
+    return queue;
+  }
+
+  function currentCard(){
+    const id = state.queue[state.pos % state.queue.length];
+    return CARDS.find(c => c.id === id);
+  }
+
+  function renderTabs(){
+    const tabs = el('tabs');
+    tabs.innerHTML = '';
+    CATEGORIES.forEach(cat => {
+      const total = CARDS.filter(c => c.cat === cat.key).length;
+      const mastered = CARDS.filter(c => c.cat === cat.key && state.statuses[c.id] === 'mastered').length;
+      const btn = document.createElement('button');
+      btn.className = 'tab' + (state.category === cat.key ? ' active' : '');
+      btn.innerHTML = `${cat.icon} ${cat.name} <span class="count">${mastered}/${total}</span>`;
+      btn.addEventListener('click', () => switchCategory(cat.key));
+      tabs.appendChild(btn);
+    });
+  }
+
+  function switchCategory(key){
+    state.category = key;
+    state.queue = buildQueue(key);
+    state.pos = 0;
+    state.flipped = false;
+    renderTabs();
+    renderCard();
+  }
+
+  function renderCard(){
+    const card = currentCard();
+    if(!card) return;
+    const catInfo = CATEGORIES.find(c => c.key === card.cat);
+
+    el('levelTag').textContent = card.level;
+    el('stampIcon').textContent = catInfo.icon;
+    el('stampIconBack').textContent = catInfo.icon;
+    el('frontText').innerHTML = card.front.replace('___', '<span class="blank">&nbsp;</span>');
+    el('answerText').textContent = card.answer;
+    el('fullText').textContent = card.full;
+    el('exampleText').textContent = card.example;
+
+    el('card').classList.remove('flipped');
+    state.flipped = false;
+
+    const total = state.queue.length;
+    el('progressLine').textContent = `Tarjeta ${ (state.pos % total) + 1 } de ${total} — ${catInfo.name}`;
+
+    const status = state.statuses[card.id];
+    el('btnMaster').textContent = status === 'mastered' ? '✓ Dominada' : '¡Lo domino!';
+    el('btnPractice').textContent = status === 'practicing' ? '↻ Practicando' : 'Aún practicando';
+
+    const isFav = state.favorites.includes(card.id);
+    el('btnSave').textContent = isFav ? '♥ Guardada en mi correspondencia' : '♥ Guardar en mi correspondencia';
+    el('btnSave').classList.toggle('active', isFav);
+  }
+
+  function flipCard(){
+    state.flipped = !state.flipped;
+    el('card').classList.toggle('flipped', state.flipped);
+  }
+
+  function nextCard(){
+    state.pos = (state.pos + 1) % state.queue.length;
+    state.streak++;
+    el('streakCount').textContent = state.streak;
+    renderCard();
+    persist();
+  }
+
+  function markPracticing(){
+    const card = currentCard();
+    state.statuses[card.id] = 'practicing';
+    renderTabs();
+    nextCard();
+  }
+
+  function markMastered(){
+    const card = currentCard();
+    state.statuses[card.id] = 'mastered';
+    renderTabs();
+    nextCard();
+  }
+
+  function toggleFavorite(){
+    const card = currentCard();
+    const idx = state.favorites.indexOf(card.id);
+    if(idx === -1){
+      state.favorites.push(card.id);
+    } else {
+      state.favorites.splice(idx,1);
+    }
+    renderCard();
+    renderMailbag();
+    persist();
+  }
+
+  function renderMailbag(){
+    const list = el('mailList');
+    list.innerHTML = '';
+    if(state.favorites.length === 0){
+      list.innerHTML = '<div class="empty-mail">Aún no has guardado ninguna frase. Toca el corazón en una tarjeta para agregarla aquí.</div>';
+      return;
+    }
+    state.favorites.forEach(id => {
+      const card = CARDS.find(c => c.id === id);
+      if(!card) return;
+      const item = document.createElement('div');
+      item.className = 'mail-item';
+      item.innerHTML = `<div class="txt"><b>${card.answer}</b><div>${card.full}</div></div>`;
+      const btn = document.createElement('button');
+      btn.textContent = 'quitar';
+      btn.addEventListener('click', () => {
+        state.favorites = state.favorites.filter(f => f !== id);
+        renderMailbag();
+        renderCard();
+        persist();
+      });
+      item.appendChild(btn);
+      list.appendChild(item);
+    });
+  }
+
+  async function persist(){
+    try{
+      await window.storage.set('englishpost:favorites', JSON.stringify(state.favorites));
+      await window.storage.set('englishpost:statuses', JSON.stringify(state.statuses));
+      await window.storage.set('englishpost:streak', JSON.stringify(state.streak));
+    }catch(e){
+      console.error('No se pudo guardar el progreso', e);
+    }
+  }
+
+  async function loadPersisted(){
+    try{
+      const fav = await window.storage.get('englishpost:favorites');
+      if(fav) state.favorites = JSON.parse(fav.value);
+    }catch(e){}
+    try{
+      const st = await window.storage.get('englishpost:statuses');
+      if(st) state.statuses = JSON.parse(st.value);
+    }catch(e){}
+    try{
+      const sk = await window.storage.get('englishpost:streak');
+      if(sk) state.streak = JSON.parse(sk.value);
+    }catch(e){}
+  }
+
+  el('card').addEventListener('click', flipCard);
+  el('card').addEventListener('keydown', (e) => {
+    if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); flipCard(); }
+  });
+  el('btnPractice').addEventListener('click', markPracticing);
+  el('btnMaster').addEventListener('click', markMastered);
+  el('btnSave').addEventListener('click', toggleFavorite);
+
+  (async function init(){
+    await loadPersisted();
+    el('streakCount').textContent = state.streak;
+    renderTabs();
+    switchCategory('greetings');
+    renderMailbag();
+  })();
+
+})();
+</script>
+</body>
+</html>
